@@ -31,11 +31,24 @@
 ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = NULL, Germline_BAF_file = NULL, chrs = c(1:22,"X","Y"), gender = NULL, sexchromosomes = c("X","Y")) {
   
   # read in SNP array data files
-  print.noquote("Reading Tumor LogR data...")
-  Tumor_LogR <- read.table(Tumor_LogR_file, header=T, row.names=1, comment.char="", sep = "\t", check.names=F)
-  print.noquote("Reading Tumor BAF data...")
-  Tumor_BAF <- read.table(Tumor_BAF_file, header=T, row.names=1, comment.char="", sep = "\t", check.names=F)
-  
+  if ("readr" %in% installed.packages()) {
+    print.noquote("Using readr:")
+    print.noquote("Reading Tumor LogR data...")
+    Tumor_LogR <- as.data.frame(readr::read_tsv(Tumor_LogR_file))
+    print.noquote("Reading Tumor BAF data...")
+    Tumor_BAF <- as.data.frame(readr::read_tsv(Tumor_BAF_file))
+    
+    rownames(Tumor_LogR) <- Tumor_LogR[,1]
+    rownames(Tumor_BAF)  <- Tumor_BAF [,1]
+    Tumor_LogR <- Tumor_LogR[,-1]
+    Tumor_BAF  <- Tumor_BAF [,-1]
+  } else {
+    print.noquote("Using read.table. Consider installing readr for faster loading.")
+    print.noquote("Reading Tumor LogR data...")
+    Tumor_LogR <- read.table(Tumor_LogR_file, header=T, row.names=1, comment.char="", sep = "\t", check.names=F)
+    print.noquote("Reading Tumor BAF data...")
+    Tumor_BAF <- read.table(Tumor_BAF_file, header=T, row.names=1, comment.char="", sep = "\t", check.names=F)
+  }
   #infinite values are a problem - change those
   Tumor_LogR[Tumor_LogR==-Inf]=NA
   Tumor_LogR[Tumor_LogR==Inf]=NA
@@ -43,11 +56,22 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
   Germline_LogR = NULL
   Germline_BAF = NULL
   if(!is.null(Germline_LogR_file)) {
-    print.noquote("Reading Germline LogR data...")
-    Germline_LogR <- read.table(Germline_LogR_file, header=T, row.names=1, comment.char="", sep = "\t", check.names=F)
-    print.noquote("Reading Germline BAF data...")
-    Germline_BAF <- read.table(Germline_BAF_file, header=T, row.names=1, comment.char="", sep = "\t", check.names=F)
-    
+    if ("readr" %in% installed.packages()) {
+      print.noquote("Reading Germline LogR data...")
+      Germline_LogR <- as.data.frame(readr::read_tsv(Germline_LogR_file))
+      print.noquote("Reading Germline BAF data...")
+      Germline_BAF <- as.data.frame(readr::read_tsv(Germline_BAF_file))
+      
+      rownames(Germline_LogR) <- Germline_LogR[,1]
+      rownames(Germline_BAF)  <- Germline_BAF [,1]
+      Germline_LogR <- Germline_LogR[,-1]
+      Germline_BAF  <- Germline_BAF [,-1]
+    } else {
+      print.noquote("Reading Germline LogR data...")
+      Germline_LogR <- read.table(Germline_LogR_file, header=T, row.names=1, comment.char="", sep = "\t", check.names=F)
+      print.noquote("Reading Germline BAF data...")
+      Germline_BAF <- read.table(Germline_BAF_file, header=T, row.names=1, comment.char="", sep = "\t", check.names=F)
+  } 
     #infinite values are a problem - change those
     Germline_LogR[Germline_LogR==-Inf]=NA
     Germline_LogR[Germline_LogR==Inf]=NA
