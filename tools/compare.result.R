@@ -1,17 +1,17 @@
 compareDF = function(df1,df2) {
   if (ncol(df1) != ncol(df2)) {
-    printf("✗\tColcount differs: %d vs %d", ncol(df1), ncol(df2))
+    printf("[FAIL]\tColcount differs: %d vs %d", ncol(df1), ncol(df2))
     return()
   }
   
   if (all(colnames(df1) == colnames(df2))) {
-    printf("✓\t Colnames are identical\n")
+    printf("[ OK ]\t Colnames are identical\n")
   } else {
-    printf("✗\tColnames differ\n")
+    printf("[FAIL]\tColnames differ\n")
   }
   
   if (nrow(df1) != nrow(df2)) {
-    printf("✗\tRowcount differs: %d vs %d", nrow(df1), nrow(df2))
+    printf("[FAIL]\tRowcount differs: %d vs %d", nrow(df1), nrow(df2))
     return()
   }
   
@@ -19,9 +19,9 @@ compareDF = function(df1,df2) {
   rows=nrow(df1)
   
   if (all(colcompare == rows)) {
-    printf("✓\t Contents are identical\n")
+    printf("[ OK ]\t Contents are identical\n")
   } else {
-    printf("✗\t%d/%d columns are different\n",
+    printf("[FAIL]\t%d/%d columns are different\n",
            sum(colcompare!=rows), rows)
   }
   
@@ -31,20 +31,20 @@ compareDF = function(df1,df2) {
 
 compareSegmentList = function(l1, l2) {
   if (length(l1) != length(l2)) {
-    printf("✗\tLengths differ: %d vs %d", length(l1), length(l2))
+    printf("[FAIL]\tLengths differ: %d vs %d", length(l1), length(l2))
     return()
   } 
   
-  printf("✓\tSame number of samples\n")
+  printf("[ OK ]\tSame number of samples\n")
   lengths1 = as.numeric(lapply(l1, length))
   lengths2 = as.numeric(lapply(l2, length))
   
   if (! all(lengths1==lengths2)) {
-    printf("✗\tLenths differ in %d of %d samples\n", 
+    printf("[FAIL]\tLenths differ in %d of %d samples\n", 
            sum(lengths1!=lengths2), length(l1))
     return()
   }
-  printf("✓\tSamples have the same lengths\n")
+  printf("[ OK ]\tSamples have the same lengths\n")
   
   identical=0
   for (i in 1:length(l1)) {
@@ -55,10 +55,10 @@ compareSegmentList = function(l1, l2) {
   }
   
   if (identical != length(l1)) {
-    printf("✗\t%d of %d samples are different\n",
+    printf("[FAIL]\t%d of %d samples are different\n",
            length(l1)-identical, length(l1))
   } else {
-    printf("✓\tAll samples are identical\n")
+    printf("[ OK ]\tAll samples are identical\n")
   }
 }
 
@@ -71,7 +71,7 @@ ascat.compareObj = function(obj1, obj2) {
   
   if (("Tumor_LogR_segmented" %in% names(obj1)) != 
       ("Tumor_LogR_segmented" %in% names(obj2)) ) {
-    printf("✗\tOnly one has Tumor_LogR_segmented\n") 
+    printf("[FAIL]\tOnly one has Tumor_LogR_segmented\n") 
   } else if ("Tumor_LogR_segmented" %in% names(obj1)) {
     printf("Comparing Tumor_LogR_segmented:\n")
     compareDF(obj1$Tumor_LogR_segmented, obj2$Tumor_LogR_segmented)
@@ -79,7 +79,7 @@ ascat.compareObj = function(obj1, obj2) {
   
   if (("Tumor_BAF_segmented" %in% names(obj1)) != 
       ("Tumor_BAF_segmented" %in% names(obj2)) ) {
-    printf("✗\tOnly one has Tumor_BAF_segmented\n") 
+    printf("[FAIL]\tOnly one has Tumor_BAF_segmented\n") 
   } else if ("Tumor_BAF_segmented" %in% names(obj1)) {
     printf("Comparing Tumor_BAF_segmented:\n")
     compareSegmentList(obj1$Tumor_BAF_segmented, obj2$Tumor_BAF_segmented)
@@ -96,8 +96,8 @@ ascat.compareResult = function(obj1, obj2) {
   
   printf("Testing ploidy:\n")
   if(all(obj1$ploidy == obj2$ploidy)) {
-    printf("✓\tIdentical\n")
+    printf("[ OK ]\tIdentical\n")
   } else {
-    printf("✗\tDifferent")
+    printf("[FAIL]\tDifferent")
   }
 }
