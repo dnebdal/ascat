@@ -34,9 +34,13 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
   if ("readr" %in% installed.packages()) {
     print.noquote("Using readr:")
     print.noquote("Reading Tumor LogR data...")
-    Tumor_LogR <- as.data.frame(readr::read_tsv(Tumor_LogR_file))
+    Tumor_LogR <- as.data.frame(readr::read_tsv(Tumor_LogR_file, 
+                                                col_types=make_colspec(Tumor_LogR_file),
+                                                skip=1, col_names=F))
     print.noquote("Reading Tumor BAF data...")
-    Tumor_BAF <- as.data.frame(readr::read_tsv(Tumor_BAF_file))
+    Tumor_BAF <- as.data.frame(readr::read_tsv(Tumor_BAF_file,
+                                               col_types=make_colspec(Tumor_BAF_file),
+                                               skip=1, col_names=F))
     
     rownames(Tumor_LogR) <- Tumor_LogR[,1]
     rownames(Tumor_BAF)  <- Tumor_BAF [,1]
@@ -58,9 +62,13 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
   if(!is.null(Germline_LogR_file)) {
     if ("readr" %in% installed.packages()) {
       print.noquote("Reading Germline LogR data...")
-      Germline_LogR <- as.data.frame(readr::read_tsv(Germline_LogR_file))
+      Germline_LogR <- as.data.frame(readr::read_tsv(Germline_LogR_file, 
+                                                     col_types=make_colspec(Germline_LogR_file),
+                                                     skip=1, col_names=F))
       print.noquote("Reading Germline BAF data...")
-      Germline_BAF <- as.data.frame(readr::read_tsv(Germline_BAF_file))
+      Germline_BAF <- as.data.frame(readr::read_tsv(Germline_BAF_file, 
+                                                     col_types=make_colspec(Germline_BAF_file),
+                                                     skip=1, col_names=F))
       
       rownames(Germline_LogR) <- Germline_LogR[,1]
       rownames(Germline_BAF)  <- Germline_BAF [,1]
@@ -2205,10 +2213,28 @@ psi <- function(x,z){
   return(xwin)
 }
 
-
-
-
-
+# Come up with a working row spec for readr,
+# handling the "first col is rowname" case,
+# and making sure the chromosome is a character
+make_colspec = function(filename) {
+  # spec1 : guess based on headers + data
+  # spec2 : guess based on data only
+  spec1 = readr::spec_tsv(filename)
+  spec2 = readr::spec_tsv(filename, skip=1, col_names=F)
+  
+  # If data and headers differ in length,
+  # add a name to the first col
+  col.names = names(spec1$cols)
+  if (length(spec1$cols) != length(spec2$cols)) {
+    col.names = c("probeID", col.names)
+  }
+  
+  # Make sure chromosome is character
+  spec2$cols[[2]] = col_character()
+  names(spec2$cols) = col.names
+  
+  return(spec2)
+}
 
 
 #' @title ascat.predictGermlineGenotypes
