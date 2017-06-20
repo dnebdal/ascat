@@ -34,13 +34,9 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
   if ("readr" %in% installed.packages()) {
     print.noquote("Using readr:")
     print.noquote("Reading Tumor LogR data...")
-    Tumor_LogR <- as.data.frame(readr::read_tsv(Tumor_LogR_file, 
-                                                col_types=make_colspec(Tumor_LogR_file),
-                                                skip=1, col_names=F))
+    Tumor_LogR <- readr_read_rawdata(Tumor_LogR_file)
     print.noquote("Reading Tumor BAF data...")
-    Tumor_BAF <- as.data.frame(readr::read_tsv(Tumor_BAF_file,
-                                               col_types=make_colspec(Tumor_BAF_file),
-                                               skip=1, col_names=F))
+    Tumor_BAF <- readr_read_rawdata(Tumor_BAF_file)
     
     rownames(Tumor_LogR) <- Tumor_LogR[,1]
     rownames(Tumor_BAF)  <- Tumor_BAF [,1]
@@ -62,13 +58,9 @@ ascat.loadData = function(Tumor_LogR_file, Tumor_BAF_file, Germline_LogR_file = 
   if(!is.null(Germline_LogR_file)) {
     if ("readr" %in% installed.packages()) {
       print.noquote("Reading Germline LogR data...")
-      Germline_LogR <- as.data.frame(readr::read_tsv(Germline_LogR_file, 
-                                                     col_types=make_colspec(Germline_LogR_file),
-                                                     skip=1, col_names=F))
+      Germline_LogR <- readr_read_rawdata(Germline_LogR_file)
       print.noquote("Reading Germline BAF data...")
-      Germline_BAF <- as.data.frame(readr::read_tsv(Germline_BAF_file, 
-                                                     col_types=make_colspec(Germline_BAF_file),
-                                                     skip=1, col_names=F))
+      Germline_BAF <- readr_read_rawdata(Germline_BAF_file)
       
       rownames(Germline_LogR) <- Germline_LogR[,1]
       rownames(Germline_BAF)  <- Germline_BAF [,1]
@@ -2161,8 +2153,8 @@ psi <- function(x,z){
 make_colspec = function(filename) {
   # spec1 : guess based on headers + data
   # spec2 : guess based on data only
-  spec1 = readr::spec_tsv(filename)
-  spec2 = readr::spec_tsv(filename, skip=1, col_names=F)
+  spec1 = readr::spec_tsv(filename, col_types=readr::cols())
+  spec2 = readr::spec_tsv(filename, skip=1, col_names=F, col_types=readr::cols())
   
   # If data and headers differ in length,
   # add a name to the first col
@@ -2172,10 +2164,16 @@ make_colspec = function(filename) {
   }
   
   # Make sure chromosome is character
-  spec2$cols[[2]] = col_character()
+  spec2$cols[[2]] = readr::col_character()
   names(spec2$cols) = col.names
   
   return(spec2)
+}
+
+readr_read_rawdata = function(filename) {
+  spec = make_colspec(filename)
+  res = readr::read_tsv(filename, col_types=spec, col_names=names(spec$cols), skip=1)
+  return(as.data.frame(res))
 }
 
 
