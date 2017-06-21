@@ -69,21 +69,21 @@ ascat.compareObj = function(obj1, obj2) {
   printf("Comparing Tumor_BAF:\n")
   compareDF(obj1$Tumor_BAF, obj2$Tumor_BAF)
   
-  if (("Tumor_LogR_segmented" %in% names(obj1)) != 
-      ("Tumor_LogR_segmented" %in% names(obj2)) ) {
+  if (is.null(obj1$Tumor_LogR_segmented) != 
+      is.null(obj2$Tumor_LogR_segmented)) {
     printf("[FAIL]\tOnly one has Tumor_LogR_segmented\n") 
-  } else if ("Tumor_LogR_segmented" %in% names(obj1)) {
+  } else if (!is.null(obj1$Tumor_LogR_segmented)) {
     printf("Comparing Tumor_LogR_segmented:\n")
-    compareDF(obj1$Tumor_LogR_segmented, obj2$Tumor_LogR_segmented)
-  }
+    compareSegmentList(obj1$Tumor_LogR_segmented, obj2$Tumor_LogR_segmented)
+  } else {printf("Neither has Tumor_LogR_segmented.\n")}
   
-  if (("Tumor_BAF_segmented" %in% names(obj1)) != 
-      ("Tumor_BAF_segmented" %in% names(obj2)) ) {
+  if (is.null(obj1$Tumor_BAF_segmented) != 
+      is.null(obj2$Tumor_BAF_segmented)) {
     printf("[FAIL]\tOnly one has Tumor_BAF_segmented\n") 
-  } else if ("Tumor_BAF_segmented" %in% names(obj1)) {
+  } else if (!is.null(obj1$Tumor_BAF_segmented)) {
     printf("Comparing Tumor_BAF_segmented:\n")
     compareSegmentList(obj1$Tumor_BAF_segmented, obj2$Tumor_BAF_segmented)
-  }
+  } else {printf("Neither has Tumor_BAF_segmented.\n")}
   
 }
 
