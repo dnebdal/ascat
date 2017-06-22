@@ -5,7 +5,7 @@ compareDF = function(df1,df2) {
   }
   
   if (all(colnames(df1) == colnames(df2))) {
-    printf("[ OK ]\t Colnames are identical\n")
+    printf("[ OK ]\tColnames are identical\n")
   } else {
     printf("[FAIL]\tColnames differ\n")
   }
@@ -15,19 +15,29 @@ compareDF = function(df1,df2) {
     return()
   }
   
-  colcompare = colSums(df1==df2)
-  rows=nrow(df1)
+  if (all(colnames(df1) == colnames(df2))) {
+    printf("[ OK ]\tRownames are identical\n")
+  } else {
+    printf("[FAIL]\tRownames differ\n")
+  }
   
-  if (all(colcompare == rows)) {
-    printf("[ OK ]\t Contents are identical\n")
+  colcompare = rep(FALSE, ncol(df1))
+  for(i in 1:ncol(df1)) {
+    c1 = df1[,i]
+    c2 = df2[,i]
+    res = all(is.na(c1) == is.na(c2))
+    res = res & all(c1==c2, na.rm=T)
+    colcompare[i] = res
+  }
+
+  if (all(colcompare)) {
+    printf("[ OK ]\tContents are identical\n")
   } else {
     printf("[FAIL]\t%d/%d columns are different\n",
-           sum(colcompare!=rows), rows)
+           sum(!colcompare), ncol(df1))
   }
   
 }
-
-
 
 compareSegmentList = function(l1, l2) {
   if (length(l1) != length(l2)) {
